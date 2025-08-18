@@ -1,15 +1,6 @@
 {
   "goals": [
     {
-      "id": "1",
-      "name": "Travel Fund - Japan",
-      "targetAmount": 5000,
-      "savedAmount": 3200,
-      "category": "Travel",
-      "deadline": "2025-12-31",
-      "createdAt": "2024-01-15"
-    },
-    {
       "id": "2",
       "name": "Emergency Fund",
       "targetAmount": 10000,
@@ -98,6 +89,24 @@
       "category": "Education",
       "deadline": "2025-08-12",
       "createdAt": "2025-08-11"
+    },
+    {
+      "id": "1755537676564",
+      "name": "Lunch",
+      "targetAmount": 3000,
+      "savedAmount": 0,
+      "category": "Lunch Funds",
+      "deadline": "2025-08-22",
+      "createdAt": "2025-08-18"
+    },
+    {
+      "id": "1755537782384",
+      "name": "Moringa",
+      "targetAmount": 200000,
+      "savedAmount": 3000,
+      "category": "School fee",
+      "deadline": "2025-10-03",
+      "createdAt": "2025-08-18"
     }
   ]
 }
