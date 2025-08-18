@@ -10,7 +10,6 @@ export default function GoalForm({ onAdd }) {
     e.preventDefault();
     if (!name || !targetAmount || !deadline) return;
     const newGoal = {
-      // json-server will create an id if not provided, but we add a timestamp id to be safe
       id: Date.now().toString(),
       name,
       targetAmount: Number(targetAmount),

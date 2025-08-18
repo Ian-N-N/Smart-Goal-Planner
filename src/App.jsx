@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { fetchGoals, createGoal, updateGoal, deleteGoal } from "./api";
 import GoalOverview from "./GoalOverview";
 import GoalForm from "./GoalForm";
 import GoalList from "./GoalList";
@@ -8,11 +7,16 @@ export default function App() {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const BASE_URL = "http://localhost:3001/goals";
+
+  // Load all goals
   useEffect(() => {
     (async () => {
-      try {
-        const res = await fetchGoals();
-        setGoals(res.data);
+      try {//try...catch as part of error handling
+        const res = await fetch(BASE_URL);
+        if (!res.ok) throw new Error("Failed to fetch goals");
+        const data = await res.json();
+        setGoals(data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -21,23 +25,52 @@ export default function App() {
     })();
   }, []);
 
+  // Add new goal
   const addGoal = async (goal) => {
-    const res = await createGoal(goal);
-    setGoals(prev => [...prev, res.data]);
+    try {
+      const res = await fetch(BASE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(goal),
+      });
+      if (!res.ok) throw new Error("Failed to create goal");
+      const newGoal = await res.json();
+      setGoals((prev) => [...prev, newGoal]);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const patchGoal = async (id, patch) => {
-    const res = await updateGoal(id, patch);
-    setGoals(prev => prev.map(g => g.id === id ? res.data : g));
+  // Updating the goals
+  const patchGoal = async (id, patch) => {//async function which updates goals in the database
+    try {
+      const res = await fetch(`${BASE_URL}/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+      if (!res.ok) throw new Error("Failed to update goal");//check if request was accepted or not
+      const updated = await res.json();
+      setGoals((prev) => prev.map((g) => (g.id === id ? updated : g)));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
+  // Deleting the goals
   const removeGoal = async (id) => {
-    await deleteGoal(id);
-    setGoals(prev => prev.filter(g => g.id !== id));
+    try {
+      const res = await fetch(`${BASE_URL}/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete goal");
+      setGoals((prev) => prev.filter((g) => g.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
+  // Deposit into a goal
   const handleDeposit = async (id, amount) => {
-    const goal = goals.find(g => g.id === id);
+    const goal = goals.find((g) => g.id === id);
     if (!goal) return;
     const updated = { savedAmount: Number(goal.savedAmount) + Number(amount) };
     await patchGoal(id, updated);
@@ -57,9 +90,16 @@ export default function App() {
         </div>
       </div>
 
-      <main style={{marginTop:16}}>
-        {loading ? <div>Loading...</div> : (
-          <GoalList goals={goals} onDeposit={handleDeposit} onEdit={patchGoal} onDelete={removeGoal} />
+      <main style={{ marginTop: 16 }}>
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <GoalList
+            goals={goals}
+            onDeposit={handleDeposit}
+            onEdit={patchGoal}
+            onDelete={removeGoal}
+          />
         )}
       </main>
     </div>
